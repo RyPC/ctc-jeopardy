@@ -1,0 +1,144 @@
+body {
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  background: #fff;
+  margin: 0;
+}
+
+.App {
+  text-align: center;
+  min-height: 100vh;
+  background: #fff;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background: #6231D8;
+  color: #fff;
+  padding: 2rem 0 0.5rem 0;
+  border-bottom: 4px solid #B0A0E2;
+  box-shadow: 0 2px 8px rgba(98,49,216,0.05);
+}
+
+.App-header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin: 0 0 1rem 0;
+  color: #fff;
+  text-shadow: 1px 2px 0 #5557AF, 0 1px 8px #6231D833;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.App-main {
+  background: #fff;
+  color: #6231D8;
+  min-height: 60vh;
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 4px 24px rgba(98,49,216,0.08);
+  padding: 2.5rem 2rem;
+  max-width: 900px;
+  margin: 0 auto 2rem auto;
+  border: 2px solid #B0A0E2;
+}
+
+.App-main h2 {
+  margin-top: 0;
+  color: #5557AF;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+section p {
+  color: #5557AF;
+  font-size: 1.1rem;
+}
+
+.landing-screen h2 {
+  color: #5557AF;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.options-container {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.option-button {
+  background: #6231D8;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 300px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(98,49,216,0.15);
+}
+
+.option-button:hover {
+  background: #5557AF;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(98,49,216,0.2);
+}
+
+.option-button h3 {
+  font-size: 1.5rem;
+  margin: 0 0 1rem 0;
+  color: white;
+}
+
+.option-button p {
+  color: #B0A0E2;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.board-screen {
+  padding: 2rem;
+}
+
+.board-screen h2 {
+  color: #5557AF;
+  margin-bottom: 1.5rem;
+}
+
+.back-button {
+  background: #6231D8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 2rem;
+}
+
+.back-button:hover {
+  background: #5557AF;
+}
