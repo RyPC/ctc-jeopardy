@@ -11,10 +11,40 @@ function App() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [currentCategory, setCurrentCategory] = useState("");
     const [questionCount, setQuestionCount] = useState(5);
-    const [questions, setQuestions] = useState<any[]>([]);
+    const [questions, setQuestions] = useState<
+        Array<{
+            category: string;
+            question: string;
+            answer: string;
+            points: number;
+        }>
+    >([]);
 
-    const handleUploadCSV = () => {
-        // TODO: Implement CSV upload
+    const handleUploadJSON = (
+        uploadedQuestions: Array<{
+            category: string;
+            question: string;
+            answer: string;
+            points: number;
+        }>
+    ) => {
+        setQuestions(uploadedQuestions);
+        const uniqueCategories = Array.from(
+            new Set(uploadedQuestions.map((q) => q.category))
+        );
+        const categoriesWithCounts = uniqueCategories.map((name) => ({
+            name,
+            questionCount: uploadedQuestions.filter((q) => q.category === name)
+                .length,
+        }));
+
+        // Set the global question count to match the maximum questions per category
+        const maxQuestionsPerCategory = Math.max(
+            ...categoriesWithCounts.map((c) => c.questionCount)
+        );
+        setQuestionCount(maxQuestionsPerCategory);
+
+        setCategories(categoriesWithCounts);
         setCurrentScreen("board");
     };
 
@@ -29,7 +59,6 @@ function App() {
                 { name: currentCategory, questionCount },
             ]);
             setCurrentCategory("");
-            // setQuestionCount(5);
         }
     };
 
@@ -39,12 +68,24 @@ function App() {
         }
     };
 
+    const handleCompleteManualEntry = (
+        newQuestions: Array<{
+            category: string;
+            question: string;
+            answer: string;
+            points: number;
+        }>
+    ) => {
+        setQuestions(newQuestions);
+        setCurrentScreen("board");
+    };
+
     const renderScreen = () => {
         switch (currentScreen) {
             case "landing":
                 return (
                     <LandingScreen
-                        onUploadCSV={handleUploadCSV}
+                        onUploadJSON={handleUploadJSON}
                         onManualEntry={handleManualEntry}
                     />
                 );
@@ -67,40 +108,72 @@ function App() {
                         categories={categories}
                         questionCount={questionCount}
                         onBack={() => setCurrentScreen("category-setup")}
+                        onComplete={handleCompleteManualEntry}
                     />
                 );
             case "board":
                 return (
-                    <BoardScreen onBack={() => setCurrentScreen("landing")} />
+                    <BoardScreen
+                        onBack={() => setCurrentScreen("landing")}
+                        categories={categories}
+                        questions={questions}
+                        questionCount={questionCount}
+                    />
                 );
         }
     };
 
     return (
         <ChakraProvider>
-            <Box minH="100vh" bg="white">
+            <Box minH="100vh" bg="#1a1a2e" position="relative">
+                {/* Background Logo */}
+                <Box
+                    position="fixed"
+                    top="50%"
+                    left="50%"
+                    transform="translate(-50%, -50%)"
+                    width="900px"
+                    height="600px"
+                    opacity="0.03"
+                    zIndex="0"
+                    pointerEvents="none"
+                    backgroundImage="url('/ctclogo.svg')"
+                    backgroundSize="contain"
+                    backgroundRepeat="no-repeat"
+                    backgroundPosition="center"
+                />
                 <Box
                     as="header"
-                    bg="#6231D8"
-                    color="white"
+                    bg="#16213e"
+                    color="#9d4edd"
                     py={8}
                     borderBottom="4px solid"
-                    borderColor="#B0A0E2"
-                    boxShadow="md"
+                    borderColor="#0f3460"
+                    boxShadow="0 4px 20px rgba(0,0,0,0.5)"
+                    position="relative"
+                    zIndex="1"
                 >
                     <Container maxW="container.xl">
                         <Heading
                             as="h1"
                             size="2xl"
                             textAlign="center"
-                            textShadow="2px 2px 0 #5557AF"
+                            textShadow="3px 3px 0 #0f3460, 6px 6px 10px rgba(0,0,0,0.8)"
+                            fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                            letterSpacing="wider"
+                            fontWeight="bold"
                         >
-                            CTC Jeopardy
+                            CTC JEOPARDY!
                         </Heading>
                     </Container>
                 </Box>
 
-                <Container maxW="container.xl" py={8}>
+                <Container
+                    maxW="container.xl"
+                    py={8}
+                    position="relative"
+                    zIndex="1"
+                >
                     {renderScreen()}
                 </Container>
             </Box>

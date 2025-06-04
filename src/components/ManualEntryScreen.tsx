@@ -26,17 +26,42 @@ interface ManualEntryScreenProps {
     categories: Category[];
     onBack: () => void;
     questionCount: number;
+    onComplete: (
+        questions: Array<{
+            category: string;
+            question: string;
+            answer: string;
+            points: number;
+        }>
+    ) => void;
 }
 
 export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({
     categories,
     onBack,
     questionCount,
+    onComplete,
 }) => {
     const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
-    const [questions, setQuestions] = useState<Question[]>([]);
+    const [questions, setQuestions] = useState<
+        Array<{
+            category: string;
+            question: string;
+            answer: string;
+            points: number;
+        }>
+    >([]);
+    const [allQuestions, setAllQuestions] = useState<
+        Array<{
+            category: string;
+            question: string;
+            answer: string;
+            points: number;
+        }>
+    >([]);
     const [currentQuestion, setCurrentQuestion] = useState("");
     const [currentAnswer, setCurrentAnswer] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const toast = useToast();
 
     const currentCategory = categories[currentCategoryIndex];
@@ -44,7 +69,7 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({
     const currentQuestionNumber = questions.length + 1;
     const currentPoints = currentQuestionNumber * 200;
 
-    const handleAddQuestion = () => {
+    const handleAddQuestion = async () => {
         if (!currentQuestion || !currentAnswer) {
             toast({
                 title: "Missing information",
@@ -56,31 +81,60 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({
             return;
         }
 
-        const newQuestion: Question = {
+        const newQuestion = {
+            category: currentCategory.name,
             question: currentQuestion,
             answer: currentAnswer,
             points: currentPoints,
         };
 
-        setQuestions([...questions, newQuestion]);
+        const updatedQuestions = [...questions, newQuestion];
+        setQuestions(updatedQuestions);
         setCurrentQuestion("");
         setCurrentAnswer("");
 
         // If we've added all questions for this category, move to next category
-        if (questions.length + 1 === currentCategory.questionCount) {
+        if (updatedQuestions.length === questionCount) {
+            // Add current category's questions to allQuestions
+            setAllQuestions((prev) => [...prev, ...updatedQuestions]);
+
             if (currentCategoryIndex < categories.length - 1) {
                 setCurrentCategoryIndex(currentCategoryIndex + 1);
                 setQuestions([]);
             } else {
-                // TODO: Handle completion of all categories
-                toast({
-                    title: "All categories completed!",
-                    description:
-                        "You've added all questions for all categories",
-                    status: "success",
-                    duration: 3000,
-                    isClosable: true,
-                });
+                setIsLoading(true);
+                try {
+                    // Download all questions as JSON
+                    const jsonString = JSON.stringify(
+                        allQuestions.concat(updatedQuestions),
+                        null,
+                        2
+                    );
+                    const blob = new Blob([jsonString], {
+                        type: "application/json",
+                    });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.download = "jeopardy-questions.json";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+
+                    // Show completion toast and transition to board
+                    toast({
+                        title: "All categories completed!",
+                        description: "Questions have been downloaded as JSON",
+                        status: "success",
+                        duration: 2000,
+                        isClosable: true,
+                        onCloseComplete: () =>
+                            onComplete(allQuestions.concat(updatedQuestions)),
+                    });
+                } finally {
+                    setIsLoading(false);
+                }
             }
         }
     };
@@ -92,7 +146,7 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({
                     Manual Entry
                 </Heading>
                 <Text color="gray.600">
-                    Category {currentCategoryIndex + 1} of {questionCount}
+                    Category {currentCategoryIndex + 1} of {categories.length}
                 </Text>
                 <Progress
                     value={progress}
@@ -117,8 +171,7 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({
                     </Heading>
                     <Stack direction="column" gap={2}>
                         <Text color="gray.600">
-                            Question {currentQuestionNumber} of{" "}
-                            {currentCategory.questionCount}
+                            Question {currentQuestionNumber} of {questionCount}
                         </Text>
                         <Badge
                             colorScheme="purple"
@@ -160,8 +213,16 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({
                         color="white"
                         _hover={{ bg: "#5557AF" }}
                         size="lg"
+                        isLoading={isLoading}
+                        loadingText={
+                            questions.length + 1 === questionCount
+                                ? currentCategoryIndex < categories.length - 1
+                                    ? "Completing Category..."
+                                    : "Finishing..."
+                                : "Adding Question..."
+                        }
                     >
-                        {questions.length + 1 === currentCategory.questionCount
+                        {questions.length + 1 === questionCount
                             ? currentCategoryIndex < categories.length - 1
                                 ? "Complete Category"
                                 : "Finish All Categories"
