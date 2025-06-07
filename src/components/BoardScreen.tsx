@@ -61,6 +61,10 @@ export const BoardScreen: React.FC<BoardScreenProps> = ({
     const [teamScores, setTeamScores] = useState(
         teams.map((team) => ({ ...team }))
     );
+    const [isOpenToAll, setIsOpenToAll] = useState(false);
+    const [originalTeamIndex, setOriginalTeamIndex] = useState<number | null>(
+        null
+    );
 
     // Group questions by category
     const questionsByCategory = categories.map((category) => {
@@ -91,6 +95,8 @@ export const BoardScreen: React.FC<BoardScreenProps> = ({
     const handleClose = () => {
         onClose();
         setShowAnswer(false);
+        setIsOpenToAll(false);
+        setOriginalTeamIndex(null);
     };
 
     const handleMarkAsUsed = () => {
@@ -105,6 +111,33 @@ export const BoardScreen: React.FC<BoardScreenProps> = ({
             }
         }
         handleClose();
+    };
+
+    const handleWrongAnswer = () => {
+        if (selectedQuestion && teamScores.length > 0) {
+            // Deduct half points from current team
+            updateTeamScore(
+                currentTurnIndex,
+                -Math.floor(selectedQuestion.points / 2)
+            );
+
+            // Open to all other teams
+            setIsOpenToAll(true);
+            setOriginalTeamIndex(currentTurnIndex);
+        }
+    };
+
+    const handleTeamSelection = (teamIndex: number) => {
+        if (selectedQuestion) {
+            // Give full points to the selected team
+            updateTeamScore(teamIndex, selectedQuestion.points);
+        }
+        handleMarkAsUsed();
+    };
+
+    const handleNoOneGotIt = () => {
+        // No additional scoring, just close
+        handleMarkAsUsed();
     };
 
     const updateTeamScore = (teamIndex: number, pointsToAdd: number) => {
@@ -393,84 +426,206 @@ export const BoardScreen: React.FC<BoardScreenProps> = ({
                                     {teamScores.length > 0 &&
                                         selectedQuestion && (
                                             <VStack spacing={3} w="full">
-                                                <Text
-                                                    color="#5557AF"
-                                                    fontWeight="bold"
-                                                    fontSize="lg"
-                                                    fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
-                                                >
-                                                    Did {currentTeam?.name} get
-                                                    it right?
-                                                </Text>
-                                                <HStack spacing={4} w="full">
-                                                    <Button
-                                                        flex={1}
-                                                        bg="green.500"
-                                                        color="white"
-                                                        _hover={{
-                                                            bg: "green.600",
-                                                        }}
-                                                        onClick={() => {
-                                                            updateTeamScore(
-                                                                currentTurnIndex,
-                                                                selectedQuestion.points
-                                                            );
-                                                            handleMarkAsUsed();
-                                                        }}
-                                                        h="50px"
-                                                        fontSize="lg"
-                                                        fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
-                                                        fontWeight="bold"
-                                                    >
-                                                        Correct (+$
-                                                        {
-                                                            selectedQuestion.points
-                                                        }
-                                                        )
-                                                    </Button>
-                                                    <Button
-                                                        flex={1}
-                                                        bg="red.500"
-                                                        color="white"
-                                                        _hover={{
-                                                            bg: "red.600",
-                                                        }}
-                                                        onClick={() => {
-                                                            updateTeamScore(
-                                                                currentTurnIndex,
-                                                                -Math.floor(
+                                                {!isOpenToAll ? (
+                                                    <>
+                                                        <Text
+                                                            color="#5557AF"
+                                                            fontWeight="bold"
+                                                            fontSize="lg"
+                                                            fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                                                        >
+                                                            Did{" "}
+                                                            {currentTeam?.name}{" "}
+                                                            get it right?
+                                                        </Text>
+                                                        <HStack
+                                                            spacing={4}
+                                                            w="full"
+                                                        >
+                                                            <Button
+                                                                flex={1}
+                                                                bg="green.500"
+                                                                color="white"
+                                                                _hover={{
+                                                                    bg: "green.600",
+                                                                }}
+                                                                onClick={() => {
+                                                                    updateTeamScore(
+                                                                        currentTurnIndex,
+                                                                        selectedQuestion.points
+                                                                    );
+                                                                    handleMarkAsUsed();
+                                                                }}
+                                                                h="50px"
+                                                                fontSize="lg"
+                                                                fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                                                                fontWeight="bold"
+                                                            >
+                                                                Correct (+$
+                                                                {
+                                                                    selectedQuestion.points
+                                                                }
+                                                                )
+                                                            </Button>
+                                                            <Button
+                                                                flex={1}
+                                                                bg="red.500"
+                                                                color="white"
+                                                                _hover={{
+                                                                    bg: "red.600",
+                                                                }}
+                                                                onClick={
+                                                                    handleWrongAnswer
+                                                                }
+                                                                h="50px"
+                                                                fontSize="lg"
+                                                                fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                                                                fontWeight="bold"
+                                                            >
+                                                                Wrong (-$
+                                                                {Math.floor(
                                                                     selectedQuestion.points /
                                                                         2
+                                                                )}
                                                                 )
-                                                            );
-                                                            handleMarkAsUsed();
-                                                        }}
-                                                        h="50px"
-                                                        fontSize="lg"
-                                                        fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
-                                                        fontWeight="bold"
-                                                    >
-                                                        Wrong (-$
-                                                        {Math.floor(
-                                                            selectedQuestion.points /
-                                                                2
-                                                        )}
-                                                        )
-                                                    </Button>
-                                                </HStack>
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    borderColor="#8A7BC8"
-                                                    color="#8A7BC8"
-                                                    _hover={{ bg: "#f0f0f0" }}
-                                                    onClick={handleMarkAsUsed}
-                                                    fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
-                                                >
-                                                    No Score Change & Close
-                                                </Button>
+                                                            </Button>
+                                                        </HStack>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            borderColor="#8A7BC8"
+                                                            color="#8A7BC8"
+                                                            _hover={{
+                                                                bg: "#f0f0f0",
+                                                            }}
+                                                            onClick={
+                                                                handleNoOneGotIt
+                                                            }
+                                                            fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                                                        >
+                                                            No Score Change &
+                                                            Close
+                                                        </Button>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Text
+                                                            color="#5557AF"
+                                                            fontWeight="bold"
+                                                            fontSize="lg"
+                                                            fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                                                            textAlign="center"
+                                                        >
+                                                            {
+                                                                teamScores[
+                                                                    originalTeamIndex!
+                                                                ]?.name
+                                                            }{" "}
+                                                            got it wrong (-$
+                                                            {Math.floor(
+                                                                selectedQuestion.points /
+                                                                    2
+                                                            )}
+                                                            )
+                                                            <br />
+                                                            Which team knows the
+                                                            answer?
+                                                        </Text>
+                                                        <Grid
+                                                            templateColumns="repeat(auto-fit, minmax(200px, 1fr))"
+                                                            gap={3}
+                                                            w="full"
+                                                        >
+                                                            {teamScores
+                                                                .map(
+                                                                    (
+                                                                        team,
+                                                                        index
+                                                                    ) => ({
+                                                                        team,
+                                                                        index,
+                                                                    })
+                                                                )
+                                                                .filter(
+                                                                    ({
+                                                                        index,
+                                                                    }) =>
+                                                                        index !==
+                                                                        originalTeamIndex
+                                                                )
+                                                                .map(
+                                                                    ({
+                                                                        team,
+                                                                        index,
+                                                                    }) => (
+                                                                        <Button
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            bg="green.500"
+                                                                            color="white"
+                                                                            _hover={{
+                                                                                bg: "green.600",
+                                                                            }}
+                                                                            onClick={() =>
+                                                                                handleTeamSelection(
+                                                                                    index
+                                                                                )
+                                                                            }
+                                                                            h="50px"
+                                                                            fontSize="md"
+                                                                            fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                                                                            fontWeight="bold"
+                                                                        >
+                                                                            {
+                                                                                team.name
+                                                                            }{" "}
+                                                                            (+$
+                                                                            {
+                                                                                selectedQuestion.points
+                                                                            }
+                                                                            )
+                                                                        </Button>
+                                                                    )
+                                                                )}
+                                                        </Grid>
+                                                        <Button
+                                                            bg="gray.500"
+                                                            color="white"
+                                                            _hover={{
+                                                                bg: "gray.600",
+                                                            }}
+                                                            onClick={
+                                                                handleNoOneGotIt
+                                                            }
+                                                            h="40px"
+                                                            fontSize="md"
+                                                            fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                                                            fontWeight="bold"
+                                                            w="full"
+                                                        >
+                                                            No One Got It
+                                                        </Button>
+                                                    </>
+                                                )}
                                             </VStack>
                                         )}
+                                </VStack>
+                            ) : (
+                                <VStack spacing={4}>
+                                    <Button
+                                        size="lg"
+                                        bg="#8A7BC8"
+                                        color="white"
+                                        _hover={{ bg: "#5557AF" }}
+                                        onClick={() => setShowAnswer(true)}
+                                        h="60px"
+                                        fontSize="xl"
+                                        fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                                        fontWeight="bold"
+                                    >
+                                        Reveal Answer
+                                    </Button>
 
                                     {/* Fallback if no teams */}
                                     {teamScores.length === 0 && (
@@ -490,20 +645,6 @@ export const BoardScreen: React.FC<BoardScreenProps> = ({
                                         </Button>
                                     )}
                                 </VStack>
-                            ) : (
-                                <Button
-                                    size="lg"
-                                    bg="#8A7BC8"
-                                    color="white"
-                                    _hover={{ bg: "#5557AF" }}
-                                    onClick={() => setShowAnswer(true)}
-                                    h="60px"
-                                    fontSize="xl"
-                                    fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
-                                    fontWeight="bold"
-                                >
-                                    Reveal Answer
-                                </Button>
                             )}
                         </VStack>
                     </ModalBody>

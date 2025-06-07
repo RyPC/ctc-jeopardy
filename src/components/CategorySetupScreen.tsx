@@ -41,69 +41,125 @@ export const CategorySetupScreen: React.FC<CategorySetupScreenProps> = ({
     onBack,
 }) => {
     return (
-        <Stack direction="column" align="center" gap={8}>
-            <Heading as="h2" size="xl" color="#5557AF">
-                Set Up Categories
-            </Heading>
+        <Stack direction="column" align="center" gap={8} w="full" maxW="800px">
+            <Stack direction="column" align="center" gap={2}>
+                <Heading
+                    as="h2"
+                    size="xl"
+                    color="#9d4edd"
+                    fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                    textShadow="2px 2px 4px rgba(0,0,0,0.8)"
+                    fontWeight="bold"
+                >
+                    Set Up Categories
+                </Heading>
+                <Text color="#a8a8db" textAlign="center">
+                    Create categories for your Jeopardy game
+                </Text>
+            </Stack>
 
-            <Grid
-                templateColumns="repeat(2, 1fr)"
-                gap={8}
+            <Box
                 w="full"
-                maxW="800px"
+                p={6}
+                bg="#16213e"
+                border="2px solid #9d4edd"
+                borderRadius="lg"
+                boxShadow="0 4px 15px rgba(0,0,0,0.5)"
             >
-                <GridItem>
-                    <Stack direction="column" gap={4}>
+                <Grid templateColumns="repeat(2, 1fr)" gap={8} w="full">
+                    <GridItem>
+                        <Stack direction="column" gap={4}>
+                            <FormControl>
+                                <FormLabel
+                                    color="#9d4edd"
+                                    fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                                >
+                                    Category Name
+                                </FormLabel>
+                                <Input
+                                    value={currentCategory}
+                                    onChange={(e) =>
+                                        onCategoryChange(e.target.value)
+                                    }
+                                    placeholder="Enter category name"
+                                    bg="#0f3460"
+                                    color="white"
+                                    border="1px solid #9d4edd"
+                                    _placeholder={{ color: "#a8a8db" }}
+                                    _focus={{ borderColor: "#8b5cf6" }}
+                                    fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                                />
+                            </FormControl>
+
+                            <Button
+                                onClick={onAddCategory}
+                                bg="#9d4edd"
+                                color="white"
+                                _hover={{ bg: "#8b5cf6" }}
+                                isDisabled={!currentCategory}
+                                fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                                fontWeight="bold"
+                            >
+                                Add Category
+                            </Button>
+                        </Stack>
+                    </GridItem>
+
+                    <GridItem>
                         <FormControl>
-                            <FormLabel>Category Name</FormLabel>
-                            <Input
-                                value={currentCategory}
-                                onChange={(e) =>
-                                    onCategoryChange(e.target.value)
+                            <FormLabel
+                                color="#9d4edd"
+                                fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                            >
+                                Questions per Category
+                            </FormLabel>
+                            <NumberInput
+                                min={1}
+                                max={10}
+                                value={questionCount}
+                                onChange={(_, value) =>
+                                    onQuestionCountChange(value)
                                 }
-                                placeholder="Enter category name"
-                            />
+                            >
+                                <NumberInputField
+                                    bg="#0f3460"
+                                    color="white"
+                                    border="1px solid #9d4edd"
+                                    _focus={{ borderColor: "#8b5cf6" }}
+                                    fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                                />
+                                <NumberInputStepper>
+                                    <NumberIncrementStepper
+                                        color="#9d4edd"
+                                        _hover={{
+                                            bg: "#8b5cf6",
+                                            color: "white",
+                                        }}
+                                    />
+                                    <NumberDecrementStepper
+                                        color="#9d4edd"
+                                        _hover={{
+                                            bg: "#8b5cf6",
+                                            color: "white",
+                                        }}
+                                    />
+                                </NumberInputStepper>
+                            </NumberInput>
+                            <Text fontSize="sm" color="#a8a8db" mt={2}>
+                                This will apply to all categories
+                            </Text>
                         </FormControl>
-
-                        <Button
-                            onClick={onAddCategory}
-                            bg="#6231D8"
-                            color="white"
-                            _hover={{ bg: "#5557AF" }}
-                            isDisabled={!currentCategory}
-                        >
-                            Add Category
-                        </Button>
-                    </Stack>
-                </GridItem>
-
-                <GridItem>
-                    <FormControl>
-                        <FormLabel>Questions per Category</FormLabel>
-                        <NumberInput
-                            min={1}
-                            max={10}
-                            value={questionCount}
-                            onChange={(_, value) =>
-                                onQuestionCountChange(value)
-                            }
-                        >
-                            <NumberInputField />
-                            <NumberInputStepper>
-                                <NumberIncrementStepper />
-                                <NumberDecrementStepper />
-                            </NumberInputStepper>
-                        </NumberInput>
-                        <Text fontSize="sm" color="gray.500" mt={2}>
-                            This will apply to all categories
-                        </Text>
-                    </FormControl>
-                </GridItem>
-            </Grid>
+                    </GridItem>
+                </Grid>
+            </Box>
 
             {categories.length > 0 && (
-                <Stack direction="column" gap={4} w="full" maxW="800px">
-                    <Heading size="md" color="#5557AF">
+                <Stack direction="column" gap={4} w="full">
+                    <Heading
+                        size="md"
+                        color="#9d4edd"
+                        fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                    >
                         Added Categories ({categories.length}/{MIN_CATEGORIES}):
                     </Heading>
                     <Grid templateColumns="repeat(3, 1fr)" gap={4}>
@@ -111,13 +167,21 @@ export const CategorySetupScreen: React.FC<CategorySetupScreenProps> = ({
                             <Box
                                 key={index}
                                 p={4}
-                                border="1px solid"
-                                borderColor="#B0A0E2"
+                                border="1px solid #9d4edd"
                                 borderRadius="md"
-                                bg="white"
+                                bg="#0f3460"
                             >
-                                <Text fontWeight="bold">{cat.name}</Text>
-                                <Text color="#5557AF">
+                                <Text
+                                    fontWeight="bold"
+                                    color="white"
+                                    fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                                >
+                                    {cat.name}
+                                </Text>
+                                <Text
+                                    color="#9d4edd"
+                                    fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                                >
                                     {questionCount} questions
                                 </Text>
                             </Box>
@@ -125,11 +189,16 @@ export const CategorySetupScreen: React.FC<CategorySetupScreenProps> = ({
                     </Grid>
                     <Button
                         onClick={onStartManualEntry}
-                        bg="#6231D8"
+                        bg="#9d4edd"
                         color="white"
-                        _hover={{ bg: "#5557AF" }}
+                        _hover={{ bg: "#8b5cf6" }}
                         mt={4}
                         isDisabled={categories.length < MIN_CATEGORIES}
+                        fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                        fontWeight="bold"
+                        size="lg"
+                        h="60px"
+                        fontSize="xl"
                     >
                         {categories.length < MIN_CATEGORIES
                             ? `Add ${
@@ -143,9 +212,11 @@ export const CategorySetupScreen: React.FC<CategorySetupScreenProps> = ({
             <Button
                 onClick={onBack}
                 variant="outline"
-                borderColor="#6231D8"
-                color="#6231D8"
-                _hover={{ bg: "#B0A0E2" }}
+                borderColor="#9d4edd"
+                color="#9d4edd"
+                _hover={{ bg: "#16213e" }}
+                fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                fontWeight="bold"
             >
                 Back to Start
             </Button>
