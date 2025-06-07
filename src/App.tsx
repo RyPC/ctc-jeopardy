@@ -3,8 +3,14 @@ import { ChakraProvider, Box, Heading, Container } from "@chakra-ui/react";
 import { LandingScreen } from "./components/LandingScreen";
 import { CategorySetupScreen } from "./components/CategorySetupScreen";
 import { ManualEntryScreen } from "./components/ManualEntryScreen";
+import { TeamSetupScreen } from "./components/TeamSetupScreen";
 import { BoardScreen } from "./components/BoardScreen";
 import { Screen, Category } from "./types";
+
+interface Team {
+    name: string;
+    score: number;
+}
 
 function App() {
     const [currentScreen, setCurrentScreen] = useState<Screen>("landing");
@@ -19,6 +25,7 @@ function App() {
             points: number;
         }>
     >([]);
+    const [teams, setTeams] = useState<Team[]>([]);
 
     const handleUploadJSON = (
         uploadedQuestions: Array<{
@@ -45,7 +52,7 @@ function App() {
         setQuestionCount(maxQuestionsPerCategory);
 
         setCategories(categoriesWithCounts);
-        setCurrentScreen("board");
+        setCurrentScreen("team-setup");
     };
 
     const handleManualEntry = () => {
@@ -77,6 +84,11 @@ function App() {
         }>
     ) => {
         setQuestions(newQuestions);
+        setCurrentScreen("team-setup");
+    };
+
+    const handleStartGame = (gameTeams: Team[]) => {
+        setTeams(gameTeams);
         setCurrentScreen("board");
     };
 
@@ -111,6 +123,22 @@ function App() {
                         onComplete={handleCompleteManualEntry}
                     />
                 );
+            case "team-setup":
+                return (
+                    <TeamSetupScreen
+                        onBack={() => {
+                            // Go back to appropriate screen based on how we got here
+                            if (questions.length > 0 && categories.length > 0) {
+                                // Came from manual entry
+                                setCurrentScreen("manual-entry");
+                            } else {
+                                // Came from JSON upload
+                                setCurrentScreen("landing");
+                            }
+                        }}
+                        onStartGame={handleStartGame}
+                    />
+                );
             case "board":
                 return (
                     <BoardScreen
@@ -118,6 +146,7 @@ function App() {
                         categories={categories}
                         questions={questions}
                         questionCount={questionCount}
+                        teams={teams}
                     />
                 );
         }

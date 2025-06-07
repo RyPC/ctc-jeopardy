@@ -142,10 +142,17 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({
     return (
         <Stack direction="column" align="center" gap={8} w="full" maxW="800px">
             <Stack direction="column" align="center" gap={2} w="full">
-                <Heading as="h2" size="xl" color="#5557AF">
+                <Heading
+                    as="h2"
+                    size="xl"
+                    color="#9d4edd"
+                    fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                    textShadow="2px 2px 4px rgba(0,0,0,0.8)"
+                    fontWeight="bold"
+                >
                     Manual Entry
                 </Heading>
-                <Text color="gray.600">
+                <Text color="#a8a8db">
                     Category {currentCategoryIndex + 1} of {categories.length}
                 </Text>
                 <Progress
@@ -160,17 +167,21 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({
             <Box
                 w="full"
                 p={6}
-                border="1px solid"
-                borderColor="#B0A0E2"
+                border="2px solid #9d4edd"
                 borderRadius="lg"
-                bg="white"
+                bg="#16213e"
+                boxShadow="0 4px 15px rgba(0,0,0,0.5)"
             >
                 <Stack direction="column" gap={6}>
-                    <Heading size="md" color="#5557AF">
+                    <Heading
+                        size="md"
+                        color="#9d4edd"
+                        fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                    >
                         {currentCategory.name}
                     </Heading>
                     <Stack direction="column" gap={2}>
-                        <Text color="gray.600">
+                        <Text color="#a8a8db">
                             Question {currentQuestionNumber} of {questionCount}
                         </Text>
                         <Badge
@@ -186,32 +197,54 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({
                     </Stack>
 
                     <FormControl>
-                        <FormLabel>Question</FormLabel>
+                        <FormLabel
+                            color="#9d4edd"
+                            fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                        >
+                            Question
+                        </FormLabel>
                         <Textarea
                             value={currentQuestion}
                             onChange={(e) => setCurrentQuestion(e.target.value)}
                             placeholder="Enter your question"
                             size="lg"
                             rows={3}
+                            bg="#0f3460"
+                            color="white"
+                            border="1px solid #9d4edd"
+                            _placeholder={{ color: "#a8a8db" }}
+                            _focus={{ borderColor: "#8b5cf6" }}
+                            fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
                         />
                     </FormControl>
 
                     <FormControl>
-                        <FormLabel>Answer</FormLabel>
+                        <FormLabel
+                            color="#9d4edd"
+                            fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                        >
+                            Answer
+                        </FormLabel>
                         <Textarea
                             value={currentAnswer}
                             onChange={(e) => setCurrentAnswer(e.target.value)}
                             placeholder="Enter the answer"
                             size="lg"
                             rows={3}
+                            bg="#0f3460"
+                            color="white"
+                            border="1px solid #9d4edd"
+                            _placeholder={{ color: "#a8a8db" }}
+                            _focus={{ borderColor: "#8b5cf6" }}
+                            fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
                         />
                     </FormControl>
 
                     <Button
                         onClick={handleAddQuestion}
-                        bg="#6231D8"
+                        bg="#9d4edd"
                         color="white"
-                        _hover={{ bg: "#5557AF" }}
+                        _hover={{ bg: "#8b5cf6" }}
                         size="lg"
                         isLoading={isLoading}
                         loadingText={
@@ -221,6 +254,8 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({
                                     : "Finishing..."
                                 : "Adding Question..."
                         }
+                        fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                        fontWeight="bold"
                     >
                         {questions.length + 1 === questionCount
                             ? currentCategoryIndex < categories.length - 1
@@ -234,9 +269,11 @@ export const ManualEntryScreen: React.FC<ManualEntryScreenProps> = ({
             <Button
                 onClick={onBack}
                 variant="outline"
-                borderColor="#6231D8"
-                color="#6231D8"
-                _hover={{ bg: "#B0A0E2" }}
+                borderColor="#9d4edd"
+                color="#9d4edd"
+                _hover={{ bg: "#16213e" }}
+                fontFamily="'Inter', 'Segoe UI', Arial, sans-serif"
+                fontWeight="bold"
             >
                 Back to Categories
             </Button>
